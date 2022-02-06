@@ -13,10 +13,10 @@ type args struct {
 }
 
 type mockServer struct {
-	ReplyStatus  int
-	MatchHeaders map[string]string
-	MatchParams  map[string]string
-	ReplyJSON    map[string]interface{}
+	replyStatus  int
+	matchHeaders map[string]string
+	matchParams  map[string]string
+	replyJSON    map[string]interface{}
 }
 
 type test_case struct {
@@ -31,22 +31,21 @@ func Test_TweetsLookup(t *testing.T) {
 	os.Setenv("TWITTER_BEARER_TOKEN", "bearer_token")
 	defer os.Clearenv()
 
-	twitterConfig, _ := NewTwitterConfig()
-	twitterClient, _ := NewTwitterClient(twitterConfig)
+	twitterClient, _ := NewTwitterClient(NewTwitterConfig())
 
 	tests := []test_case{
 		{
 			title: "200 success with multiple ids",
 			args:  args{ids: []string{"1", "2"}},
 			mockServer: mockServer{
-				MatchHeaders: map[string]string{
+				matchHeaders: map[string]string{
 					"Authorization": "^Bearer bearer_token$",
 				},
-				MatchParams: map[string]string{
+				matchParams: map[string]string{
 					"ids": "1,2",
 				},
-				ReplyStatus: 200,
-				ReplyJSON: map[string]interface{}{
+				replyStatus: 200,
+				replyJSON: map[string]interface{}{
 					"data": []map[string]string{
 						{
 							"id":   "1",
@@ -71,14 +70,14 @@ func Test_TweetsLookup(t *testing.T) {
 			title: "200 success with single ids",
 			args:  args{ids: []string{"1"}},
 			mockServer: mockServer{
-				MatchHeaders: map[string]string{
+				matchHeaders: map[string]string{
 					"Authorization": "^Bearer bearer_token$",
 				},
-				MatchParams: map[string]string{
+				matchParams: map[string]string{
 					"ids": "1",
 				},
-				ReplyStatus: 200,
-				ReplyJSON: map[string]interface{}{
+				replyStatus: 200,
+				replyJSON: map[string]interface{}{
 					"data": []map[string]string{
 						{
 							"id":   "1",
@@ -98,14 +97,14 @@ func Test_TweetsLookup(t *testing.T) {
 			title: "200 success with no hit ids",
 			args:  args{ids: []string{"1"}},
 			mockServer: mockServer{
-				MatchHeaders: map[string]string{
+				matchHeaders: map[string]string{
 					"Authorization": "^Bearer bearer_token$",
 				},
-				MatchParams: map[string]string{
+				matchParams: map[string]string{
 					"ids": "1",
 				},
-				ReplyStatus: 200,
-				ReplyJSON: map[string]interface{}{
+				replyStatus: 200,
+				replyJSON: map[string]interface{}{
 					"errors": []map[string]string{
 						{
 							"value":         "1",
@@ -128,14 +127,14 @@ func Test_TweetsLookup(t *testing.T) {
 			title: "401 unauthorized",
 			args:  args{ids: []string{"1"}},
 			mockServer: mockServer{
-				MatchHeaders: map[string]string{
+				matchHeaders: map[string]string{
 					"Authorization": "^Bearer bearer_token$",
 				},
-				MatchParams: map[string]string{
+				matchParams: map[string]string{
 					"ids": "1",
 				},
-				ReplyStatus: 401,
-				ReplyJSON: map[string]interface{}{
+				replyStatus: 401,
+				replyJSON: map[string]interface{}{
 					"title":  "Unauthorized",
 					"type":   "about:blank",
 					"status": 401,
@@ -151,12 +150,12 @@ func Test_TweetsLookup(t *testing.T) {
 		t.Run(tt.title, func(t *testing.T) {
 			assert := assert.New(t)
 			defer gock.Off()
-			gock.New(twitterConfig.Endpoint).
-				MatchHeaders(tt.MatchHeaders).
-				MatchParams(tt.MatchParams).
+			gock.New(twitterClient.config.endpoint).
+				MatchHeaders(tt.matchHeaders).
+				MatchParams(tt.matchParams).
 				Get("/tweets").
-				Reply(tt.ReplyStatus).
-				JSON(tt.ReplyJSON)
+				Reply(tt.replyStatus).
+				JSON(tt.replyJSON)
 			res, err := twitterClient.TweetsLookup(tt.args.ids)
 			assert.Equal(tt.wantErr, err != nil)
 			assert.Equal(tt.want, res)

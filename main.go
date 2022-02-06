@@ -1,6 +1,7 @@
 package main
 
 import (
+	"aozou99/with-tweet-api/api/deepl"
 	"aozou99/with-tweet-api/api/twitter"
 	"fmt"
 	"log"
@@ -22,8 +23,23 @@ func main() {
 		log.Fatalln(err.Error())
 		return
 	}
+
+	txts := make([]string, 0, len(tweets.Tweets))
+
 	for _, t := range tweets.Tweets {
-		fmt.Println(t)
+		txts = append(txts, t.Text)
+	}
+	fmt.Println(len(tweets.Tweets), txts)
+
+	deepLClient := deepl.NewDeepLClient(*deepl.NewDeepLConfig())
+	res, err := deepLClient.TranslateText(txts, "EN")
+	if err != nil {
+		log.Fatalln(err.Error())
+		return
+	}
+
+	for _, v := range res.Translations {
+		fmt.Println(v)
 	}
 
 }

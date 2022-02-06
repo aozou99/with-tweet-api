@@ -20,7 +20,7 @@ type Tweet struct {
 }
 
 type TwitterClient struct {
-	config *TwitterConfig
+	config *twitterConfig
 	client *http.Client
 }
 
@@ -40,8 +40,8 @@ func buildUrl(base, p string, param map[string]string) (*url.URL, error) {
 	return u, nil
 }
 
-func (tc *TwitterClient) genGetRequest(target string, param map[string]string) (*http.Request, error) {
-	url, err := buildUrl(tc.config.Endpoint, target, param)
+func (tc TwitterClient) genGetRequest(target string, param map[string]string) (*http.Request, error) {
+	url, err := buildUrl(tc.config.endpoint, target, param)
 	if err != nil {
 		return nil, err
 	}
@@ -49,15 +49,15 @@ func (tc *TwitterClient) genGetRequest(target string, param map[string]string) (
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", tc.config.BearerToken))
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", tc.config.bearerToken))
 	return req, nil
 }
 
-func NewTwitterClient(config *TwitterConfig) (*TwitterClient, error) {
+func NewTwitterClient(config *twitterConfig) (*TwitterClient, error) {
 	return &TwitterClient{config: config, client: &http.Client{}}, nil
 }
 
-func (tc *TwitterClient) TweetsLookup(ids []string) (*TweetsLookupResponse, error) {
+func (tc TwitterClient) TweetsLookup(ids []string) (*TweetsLookupResponse, error) {
 	req, err := tc.genGetRequest("tweets", map[string]string{
 		"ids": strings.Join(ids, ","),
 	})
