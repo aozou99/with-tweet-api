@@ -3,6 +3,8 @@ package main
 import (
 	"aozou99/with-tweet-api/api/deepl"
 	"aozou99/with-tweet-api/api/twitter"
+	"aozou99/with-tweet-api/model"
+	"aozou99/with-tweet-api/repository"
 	"fmt"
 	"log"
 
@@ -14,10 +16,11 @@ func main() {
 	if err != nil {
 		panic("Error loading .env file")
 	}
-	t_config, _ := twitter.NewTwitterConfig()
-	twitterClient, _ := twitter.NewTwitterClient(t_config)
+	twitterClient, _ := twitter.NewTwitterClient(twitter.NewTwitterConfig())
 	tweets, err := twitterClient.TweetsLookup([]string{
 		"1489729243810787328",
+		"1491005135471841286",
+		"1491019310415822849",
 	})
 	if err != nil {
 		log.Fatalln(err.Error())
@@ -38,8 +41,16 @@ func main() {
 		return
 	}
 
-	for _, v := range res.Translations {
-		fmt.Println(v)
+	ttr := repository.NewTranslatedTweetRepository()
+	if ttr == nil {
+		return
+	}
+	for i, v := range res.Translations {
+		ttr.Create(&model.TranslatedTweet{
+			ID:             tweets.Tweets[i].ID,
+			OriginText:     tweets.Tweets[i].Text,
+			TranslatedText: v.Text,
+		})
 	}
 
 }
