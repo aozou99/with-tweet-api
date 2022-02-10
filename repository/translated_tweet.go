@@ -18,10 +18,10 @@ func NewTranslatedTweetRepository() *TranslatedTweetRepository {
 	return translated_tweet_repository
 }
 
-func (r *TranslatedTweetRepository) Create(m *model.TranslatedTweet) bool {
-	result := r.db.Create(&m)
+func (r *TranslatedTweetRepository) Create(m *model.TranslatedTweet) int64 {
+	result := r.db.FirstOrCreate(&m)
 	if result.Error != nil {
 		log.Error().Interface("error", errs.Wrap(result.Error)).Send()
 	}
-	return result.Error != nil
+	return result.RowsAffected
 }
