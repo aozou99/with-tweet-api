@@ -1,0 +1,13 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type TranslatedTweet {
+  tweet_id: String!
+  origin_text: String!
+  translated_text: String!
+}
+
+type Query {
+  latestTweets: [TranslatedTweet!]!
+}

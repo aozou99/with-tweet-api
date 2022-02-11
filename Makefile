@@ -7,3 +7,12 @@ postgress-rebuild:
 	docker-compose down -v
 	docker-compose build --no-cache
 	docker-compose up -d
+
+generate:
+	@if [ ! -d "./vendor" ]; then\
+  	go mod vendor;\
+	fi
+	go run ./gqlgen.go
+
+run:
+	go run ./cmd/tweet_dstribution/main.go

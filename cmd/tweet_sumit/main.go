@@ -1,10 +1,10 @@
-package main
+package submit
 
 import (
-	"aozou99/with-tweet-api/api/deepl"
-	"aozou99/with-tweet-api/api/twitter"
-	"aozou99/with-tweet-api/model"
-	"aozou99/with-tweet-api/repository"
+	"aozou99/with-tweet-api/pkg/api/deepl"
+	"aozou99/with-tweet-api/pkg/api/twitter"
+	"aozou99/with-tweet-api/pkg/entity"
+	"aozou99/with-tweet-api/pkg/repository"
 	"fmt"
 	"log"
 
@@ -41,12 +41,12 @@ func main() {
 		return
 	}
 
-	ttr := repository.NewTranslatedTweetRepository()
+	ttr := repository.NewRepository().TranslatedTweet()
 	if ttr == nil {
 		return
 	}
 	for i, v := range res.Translations {
-		ttr.Create(&model.TranslatedTweet{
+		ttr.Create(&entity.TranslatedTweet{
 			ID:             tweets.Tweets[i].ID,
 			OriginText:     tweets.Tweets[i].Text,
 			TranslatedText: v.Text,

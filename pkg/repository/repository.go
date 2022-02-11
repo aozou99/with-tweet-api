@@ -24,6 +24,10 @@ func NewRepository() *Repository {
 	return repository
 }
 
+func (r *Repository) TranslatedTweet() *TranslatedTweetRepository {
+	return &TranslatedTweetRepository{*repository}
+}
+
 func (r *Repository) init() {
 	if r.db != nil {
 		return
