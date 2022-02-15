@@ -39,8 +39,10 @@ require (
 )
 
 require (
+	github.com/go-chi/chi v1.5.4
 	github.com/h2non/parth v0.0.0-20190131123155-b4df798d6542 // indirect
 	github.com/jackc/pgx/v4 v4.15.0
+	github.com/rs/cors v1.8.2
 	github.com/rs/zerolog v1.26.1
 	github.com/spiegel-im-spiegel/errs v1.0.5
 	github.com/stretchr/testify v1.7.0
