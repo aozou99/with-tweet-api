@@ -1,4 +1,4 @@
-package submit
+package main
 
 import (
 	"aozou99/with-tweet-api/pkg/api/deepl"

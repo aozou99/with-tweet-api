@@ -1,7 +1,7 @@
 GOOSE_DBSTRING = "user=admin dbname=with-tweet sslmode=disable password=admin"
 
-migration-%:
-	GOOSE_DRIVER=postgres GOOSE_DBSTRING=${GOOSE_DBSTRING} goose -dir ./migration ${@:migration-%=%}
+migrate-%:
+	GOOSE_DRIVER=postgres GOOSE_DBSTRING=${GOOSE_DBSTRING} goose -dir ./pkg/migration ${@:migrate-%=%}
 
 postgress-rebuild:
 	docker-compose down -v
@@ -14,5 +14,8 @@ generate:
 	fi
 	go run ./gqlgen.go
 
-run:
+run-server:
 	go run ./cmd/tweet_dstribution/main.go
+
+run-batch:
+	go run ./cmd/tweet_submit/main.go
