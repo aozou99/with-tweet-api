@@ -24,3 +24,9 @@ func (r *TranslatedTweetRepository) Latest(limit int) []*entity.TranslatedTweet 
 	r.db.Limit(limit).Order("created_at desc").Find(&results)
 	return results
 }
+
+func (r *TranslatedTweetRepository) Find(id string) *entity.TranslatedTweet {
+	var result entity.TranslatedTweet
+	r.db.First(&result, id)
+	return &result
+}

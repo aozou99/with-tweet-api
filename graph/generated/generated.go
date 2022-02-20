@@ -44,6 +44,7 @@ type DirectiveRoot struct {
 type ComplexityRoot struct {
 	Query struct {
 		LatestTweets func(childComplexity int) int
+		Tweet        func(childComplexity int, id string) int
 	}
 
 	TranslatedTweet struct {
@@ -55,6 +56,7 @@ type ComplexityRoot struct {
 
 type QueryResolver interface {
 	LatestTweets(ctx context.Context) ([]*model.TranslatedTweet, error)
+	Tweet(ctx context.Context, id string) (*model.TranslatedTweet, error)
 }
 
 type executableSchema struct {
@@ -78,6 +80,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.LatestTweets(childComplexity), true
+
+	case "Query.tweet":
+		if e.complexity.Query.Tweet == nil {
+			break
+		}
+
+		args, err := ec.field_Query_tweet_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Tweet(childComplexity, args["id"].(string)), true
 
 	case "TranslatedTweet.origin_text":
 		if e.complexity.TranslatedTweet.OriginText == nil {
@@ -162,6 +176,7 @@ type TranslatedTweet {
 
 type Query {
   latestTweets: [TranslatedTweet!]!
+  tweet(id: String!): TranslatedTweet
 }
 `, BuiltIn: false},
 }
@@ -183,6 +198,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_tweet_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -272,6 +302,45 @@ func (ec *executionContext) _Query_latestTweets(ctx context.Context, field graph
 	res := resTmp.([]*model.TranslatedTweet)
 	fc.Result = res
 	return ec.marshalNTranslatedTweet2ᚕᚖaozou99ᚋwithᚑtweetᚑapiᚋgraphᚋmodelᚐTranslatedTweetᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_tweet(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_tweet_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Tweet(rctx, args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.TranslatedTweet)
+	fc.Result = res
+	return ec.marshalOTranslatedTweet2ᚖaozou99ᚋwithᚑtweetᚑapiᚋgraphᚋmodelᚐTranslatedTweet(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1629,6 +1698,26 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
+		case "tweet":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_tweet(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
 		case "__type":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -2501,6 +2590,13 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	}
 	res := graphql.MarshalString(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOTranslatedTweet2ᚖaozou99ᚋwithᚑtweetᚑapiᚋgraphᚋmodelᚐTranslatedTweet(ctx context.Context, sel ast.SelectionSet, v *model.TranslatedTweet) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._TranslatedTweet(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

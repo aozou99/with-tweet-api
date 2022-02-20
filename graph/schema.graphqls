@@ -10,4 +10,5 @@ type TranslatedTweet {
 
 type Query {
   latestTweets: [TranslatedTweet!]!
+  tweet(id: String!): TranslatedTweet
 }

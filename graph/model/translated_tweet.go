@@ -11,6 +11,9 @@ type TranslatedTweet struct {
 }
 
 func NewTranslatedTweetFromEntity(e *entity.TranslatedTweet) *TranslatedTweet {
+	if e == nil {
+		return nil
+	}
 	return &TranslatedTweet{
 		TweetID:        e.ID,
 		OriginText:     e.OriginText,

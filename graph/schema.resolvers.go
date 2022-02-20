@@ -18,6 +18,11 @@ func (r *queryResolver) LatestTweets(ctx context.Context) ([]*model.TranslatedTw
 	return models, nil
 }
 
+func (r *queryResolver) Tweet(ctx context.Context, id string) (*model.TranslatedTweet, error) {
+	entity := r.Repository.TranslatedTweet().Find(id)
+	return model.NewTranslatedTweetFromEntity(entity), nil
+}
+
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
